@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Build artifacts
+dist/
+coverage/
+frontend/.vite/
+*.tsbuildinfo
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Local databases / generated files
+backend/generated/
+backend/prisma/dev.db
+
+# IDE / local tooling
+.DS_Store
+.idea/
+.vscode/
+.mcp.json
+
+# Logs / caches
+*.log
+.turbo/

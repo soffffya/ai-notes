@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum NoteStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum AiActionType {
+  ASSIGN_CATEGORY
+  ADD_TO_LIST
+  SUGGEST_CATEGORY
+  SUGGEST_LIST
+}
+
+model User {
+  id           String       @id @default(cuid())
+  email        String       @unique
+  passwordHash String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  notes        Note[]
+  categories   Category[]
+  lists        List[]
+  aiActions    AiActionLog[]
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  isSystem    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notes       Note[]
+
+  @@unique([userId, name])
+}
+
+model Note {
+  id            String        @id @default(cuid())
+  title         String?
+  content       String
+  status        NoteStatus    @default(ACTIVE)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  userId        String
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId    String
+  category      Category      @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  listItems     ListItem[]
+  aiActions     AiActionLog[]
+}
+
+model List {
+  id          String     @id @default(cuid())
+  name        String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items       ListItem[]
+
+  @@unique([userId, name])
+}
+
+model ListItem {
+  id         String   @id @default(cuid())
+  text       String
+  done       Boolean  @default(false)
+  position   Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  listId     String
+  list       List     @relation(fields: [listId], references: [id], onDelete: Cascade)
+  noteId     String?
+  note       Note?    @relation(fields: [noteId], references: [id], onDelete: SetNull)
+
+  @@unique([listId, text])
+  @@unique([listId, position])
+  @@unique([listId, noteId])
+}
+
+model AiActionLog {
+  id             String       @id @default(cuid())
+  type           AiActionType
+  confidence     Float
+  autoApplied    Boolean      @default(false)
+  undoneAt       DateTime?
+  payloadJson    Json
+  createdAt      DateTime     @default(now())
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  noteId         String?
+  note           Note?        @relation(fields: [noteId], references: [id], onDelete: SetNull)
+}
