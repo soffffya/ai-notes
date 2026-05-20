@@ -12,8 +12,13 @@
     "dev:frontend": "npm run dev --workspace frontend",
     "build": "npm run build --workspace backend && npm run build --workspace frontend",
     "lint": "npm run lint --workspace backend && npm run lint --workspace frontend",
+    "test:e2e": "docker compose up -d db && npm run prisma:deploy --workspace backend && playwright test",
+    "test:e2e:headed": "playwright test --headed",
     "format": "npm run format --workspace backend && npm run format --workspace frontend",
     "prisma:generate": "npm run prisma:generate --workspace backend",
     "prisma:migrate": "npm run prisma:migrate --workspace backend"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.54.2"
   }
 }

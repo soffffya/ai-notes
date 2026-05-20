@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { EditorMode, NoteEditorState, SaveState } from '@/components/home/types';
-import { apiFetch } from '@/api/client';
+import { createNote as createNoteRequest, updateNote as updateNoteRequest } from '@/api/workspace';
 import { useNotifications } from '@/hooks/use-notifications';
 import type { WorkspaceState } from '@/hooks/use-workspace-data';
 import type { Category, Note } from '@/types';
@@ -70,13 +70,10 @@ export function useNoteEditor({ categories, onAnalyzeNote, onError, workspace }:
     setSaveState('saving');
     autosaveTimerRef.current = window.setTimeout(async () => {
       try {
-        const note = await apiFetch<Note>(`/notes/${workspace.selectedNote!.id}`, {
-          method: 'PATCH',
-          body: JSON.stringify({
-            title: editor.title || undefined,
-            content: editor.content,
-            categoryId: editor.categoryId,
-          }),
+        const note = await updateNoteRequest(workspace.selectedNote!.id, {
+          title: editor.title || undefined,
+          content: editor.content,
+          categoryId: editor.categoryId,
         });
 
         workspace.setNotes((current) =>
@@ -132,12 +129,9 @@ export function useNoteEditor({ categories, onAnalyzeNote, onError, workspace }:
     setSaveState('saving');
 
     try {
-      const note = await apiFetch<Note>('/notes', {
-        method: 'POST',
-        body: JSON.stringify({
-          title: editor.title.trim() || undefined,
-          content,
-        }),
+      const note = await createNoteRequest({
+        title: editor.title.trim() || undefined,
+        content,
       });
 
       workspace.setNotes((current) => [note, ...current]);

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { apiFetch } from '@/api/client';
+import { loadWorkspace } from '@/api/workspace';
 import i18n from '@/i18n';
 import type { Category, ListItem, Note, NotesList } from '@/types';
 
@@ -32,11 +32,7 @@ export function useWorkspaceData(enabled = true) {
       setBootstrapError(null);
 
       try {
-        const [nextNotes, nextCategories, nextLists] = await Promise.all([
-          apiFetch<Note[]>('/notes'),
-          apiFetch<Category[]>('/categories'),
-          apiFetch<NotesList[]>('/lists'),
-        ]);
+        const { notes: nextNotes, categories: nextCategories, lists: nextLists } = await loadWorkspace();
 
         if (cancelled || !activeRef.current) {
           return;

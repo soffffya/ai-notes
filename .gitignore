@@ -25,3 +25,5 @@ backend/prisma/dev.db
 # Logs / caches
 *.log
 .turbo/
+playwright-report/
+test-results/
