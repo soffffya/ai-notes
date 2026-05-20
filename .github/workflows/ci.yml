@@ -79,6 +79,9 @@ jobs:
       - name: Install Playwright browser
         run: npx playwright install --with-deps chromium
 
+      - name: Generate Prisma client
+        run: npm run prisma:generate --workspace backend
+
       - name: Apply Prisma migrations
         run: npm run prisma:deploy --workspace backend
 
