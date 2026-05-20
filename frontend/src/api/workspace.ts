@@ -87,7 +87,9 @@ export function reorderListItems(listId: string, itemIds: string[]) {
   });
 }
 
-export function createNote(payload: Pick<Note, 'content'> & Partial<Pick<Note, 'title'>>) {
+export function createNote(
+  payload: Pick<Note, 'content'> & Partial<Pick<Note, 'title' | 'categoryId'>>,
+) {
   return apiFetch<Note>('/notes', {
     method: 'POST',
     body: JSON.stringify(payload),

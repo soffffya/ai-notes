@@ -9,15 +9,32 @@ export class NotesService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(userId: string, dto: CreateNoteDto) {
-    const uncategorized = await this.prisma.category.findFirst({
-      where: {
-        userId,
-        isSystem: true,
-      },
-    });
+    let categoryId = dto.categoryId;
 
-    if (!uncategorized) {
-      throw new InternalServerErrorException('System category is missing');
+    if (categoryId) {
+      const category = await this.prisma.category.findFirst({
+        where: {
+          id: categoryId,
+          userId,
+        },
+      });
+
+      if (!category) {
+        throw new NotFoundException('Category not found');
+      }
+    } else {
+      const uncategorized = await this.prisma.category.findFirst({
+        where: {
+          userId,
+          isSystem: true,
+        },
+      });
+
+      if (!uncategorized) {
+        throw new InternalServerErrorException('System category is missing');
+      }
+
+      categoryId = uncategorized.id;
     }
 
     return this.prisma.note.create({
@@ -25,7 +42,7 @@ export class NotesService {
         title: dto.title,
         content: dto.content,
         userId,
-        categoryId: uncategorized.id,
+        categoryId,
       },
       include: {
         category: true,

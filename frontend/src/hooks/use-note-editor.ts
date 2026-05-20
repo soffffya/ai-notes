@@ -132,6 +132,7 @@ export function useNoteEditor({ categories, onAnalyzeNote, onError, workspace }:
       const note = await createNoteRequest({
         title: editor.title.trim() || undefined,
         content,
+        categoryId: editor.categoryId,
       });
 
       workspace.setNotes((current) => [note, ...current]);

@@ -101,6 +101,17 @@ describe('useNoteEditor', () => {
       await result.current.createNote();
     });
 
+    expect(apiFetchMock).toHaveBeenCalledWith(
+      '/notes',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({
+          title: 'Fresh note',
+          content: 'Fresh note',
+          categoryId: 'category-1',
+        }),
+      }),
+    );
     expect(state.notes[0]).toEqual(createdNote);
     expect(workspace.setSelectedNoteId).toHaveBeenCalledWith(createdNote.id);
     expect(result.current.isEditorOpen).toBe(false);
